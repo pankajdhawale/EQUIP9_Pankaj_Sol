@@ -5,29 +5,47 @@ def find_nearest_equipment(n, edges, availability, start_provider, target_equipm
     for a, b in edges:
         graph[a].append(b)
         graph[b].append(a)
-    
-    queue = deque([[start_provider]])
+
+    if target_equipment in availability.get(start_provider, []):
+        return [start_provider]
+
+    queue = deque([(start_provider, [start_provider])])
     visited = set([start_provider])
-    
+
     while queue:
-        path = queue.popleft()
-        provider = path[-1]
-        
-        if target_equipment in availability.get(provider, []):
-            return path
-        
+        provider, path = queue.popleft()
         for neighbor in graph[provider]:
             if neighbor not in visited:
-                queue.append(path + [neighbor])
+                new_path = path + [neighbor]
+                if target_equipment in availability.get(neighbor, []):
+                    return new_path
+                queue.append((neighbor, new_path))
                 visited.add(neighbor)
-    
+
     return -1
 
-# Example test case
+# Case 1
+
 n = 5
 edges = [(1, 2), (2, 3), (3, 4), (4, 5)]
 availability = {1: ["excavator"], 2: [], 3: ["bulldozer"], 4: ["excavator"], 5: ["crane"]}
 start_provider = 2
 target_equipment = "excavator"
 
-print(find_nearest_equipment(n, edges, availability, start_provider, target_equipment))
+# Ouput : [2,1]
+
+# Case 2
+
+# n = 6
+# edges = [(1, 2), (2, 3), (3, 4), (4, 5), (5, 6)]
+# availability = {1: ["crane"], 2: ["excavator"], 3: ["bulldozer"], 4: ["crane"], 5: [], 6: ["excavator"]}
+# start_provider = 2
+# target_equipment = "excavator"
+
+
+# Output: [2]
+
+
+output = find_nearest_equipment(n, edges, availability, start_provider, target_equipment)
+
+print(output)  
